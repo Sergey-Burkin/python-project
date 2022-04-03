@@ -18,14 +18,14 @@ class Figure:
     def move(self, board, position_from,
              position_to):  # return the color of next turn
         result = next_color(self.color)
-        board.get_ceil(position_to).figure = board.get_ceil(
+        board.get_square(position_to).figure = board.get_square(
             position_from).figure
         for current_position in get_intermediate_positions(position_from,
                                                            position_to):
-            if not board.get_ceil(current_position).empty():
-                if board.get_ceil(current_position).figure.color != self.color:
+            if not board.get_square(current_position).empty():
+                if board.get_square(current_position).figure.color != self.color:
                     result = self.color
-            board.get_ceil(current_position).figure = None
+            board.get_square(current_position).figure = None
         return result
 
 
@@ -68,15 +68,15 @@ class Men(Figure):
             if not board.is_valid(next_position) or not board.is_valid(
                     next_to_position):
                 continue
-            square = board.get_ceil(next_position)
-            next_square = board.get_ceil(next_to_position)
+            square = board.get_square(next_position)
+            next_square = board.get_square(next_to_position)
             if not square.empty() and square.figure.color != self.color and next_square.empty():
                 if mark_squares:
                     next_square.beaten = True
                 result = True
         return result
 
-    def mark_the_cells(self, board, my_position):
+    def mark_the_squares(self, board, my_position):
         if self.can_eat(board, my_position, True):
             return
         if self.color == Color.BLACK:
@@ -87,9 +87,9 @@ class Men(Figure):
             next_position = add_vector_to_point(my_position, direction)
             if not board.is_valid(next_position):
                 continue
-            the_ceil = board.get_ceil(next_position)
-            if the_ceil.empty():
-                the_ceil.beaten = True
+            the_square = board.get_square(next_position)
+            if the_square.empty():
+                the_square.beaten = True
 
 
 def get_possible_position(board, my_position, direction):
@@ -98,7 +98,7 @@ def get_possible_position(board, my_position, direction):
         position = add_vector_to_point(my_position, direction, i)
         if not board.is_valid(position):
             break
-        if not board.get_ceil(position).empty():
+        if not board.get_square(position).empty():
             break
         result.append(position)
     return result
@@ -122,8 +122,8 @@ class King(Figure):
                 if not (board.is_valid(new_position) and board.is_valid(
                         next_position)):
                     break
-                current_square = board.get_ceil(new_position)
-                next_square = board.get_ceil(next_position)
+                current_square = board.get_square(new_position)
+                next_square = board.get_square(next_position)
                 if current_square.empty():
                     continue
                 if current_square.figure.color == self.color:
@@ -139,36 +139,36 @@ class King(Figure):
             for direction in self.directions:
                 for position in get_possible_position(board, my_position,
                                                       direction):
-                    board.get_ceil(position).beaten = True
+                    board.get_square(position).beaten = True
             return
         for direction in self.directions:
             for i in range(1, INF):
                 position = add_vector_to_point(my_position, direction, i)
                 if not board.is_valid(position):
                     break
-                current_square = board.get_ceil(position)
+                current_square = board.get_square(position)
                 if current_square.empty():
                     continue
                 if current_square.figure.color == self.color:
                     break
                 other_figure = current_square.figure
                 current_square.figure = None
-                board.get_ceil(my_position).figure = None
+                board.get_square(my_position).figure = None
                 can_beat_after = False
                 possible_position = get_possible_position(board, position,
                                                           direction)
                 for new_position in possible_position:
                     if self.can_eat(board, new_position):
-                        board.get_ceil(new_position).beaten = True
+                        board.get_square(new_position).beaten = True
                         can_beat_after = True
                 if not can_beat_after:
                     for new_position in possible_position:
-                        board.get_ceil(new_position).beaten = True
+                        board.get_square(new_position).beaten = True
                 current_square.figure = other_figure
-                board.get_ceil(my_position).figure = self
+                board.get_square(my_position).figure = self
 
 
-class Ceil:
+class Square:
     color = Color.WHITE
     figure = None
     beaten = False
@@ -196,7 +196,7 @@ class Board:
 
     def __init__(self, size=10):
         self.size = size
-        self.board = [[Ceil() for _ in range(self.size)] for _ in
+        self.board = [[Square() for _ in range(self.size)] for _ in
                       range(self.size)]
         for i in range(self.size):
             for j in range(self.size):
@@ -207,16 +207,16 @@ class Board:
         for i in range(self.size):
             print(i, *self.board[i], i)
 
-    def ceil_by_coordinate(self, n):
+    def square_by_coordinate(self, n):
         return self.board[(n - 1) // 5][(n - 1) % 5 * 2 + 1 - (n - 1) // 5 % 2]
 
     def set_checkers(self):
         for i in range(1, 21):
-            self.ceil_by_coordinate(i).figure = Men(Color.BLACK)
+            self.square_by_coordinate(i).figure = Men(Color.BLACK)
         for i in range(31, 51):
-            self.ceil_by_coordinate(i).figure = Men(Color.WHITE)
+            self.square_by_coordinate(i).figure = Men(Color.WHITE)
 
-    def get_ceil(self, position):
+    def get_square(self, position):
         return self.board[position[0]][position[1]]
 
     def is_valid(self, position):
@@ -226,23 +226,23 @@ class Board:
         return True
 
     def mark(self, position):
-        self.get_ceil(position).figure.mark_the_cells(self, position)
+        self.get_square(position).figure.mark_the_squares(self, position)
 
     def can_eat(self, position):
-        return self.get_ceil(position).figure.can_eat(self, position)
+        return self.get_square(position).figure.can_eat(self, position)
 
     def any_can_eat(self, color):
         for i in range(self.size):
             for j in range(self.size):
-                if not self.get_ceil((i, j)).empty():
-                    if self.can_eat((i, j)) and self.get_ceil(
+                if not self.get_square((i, j)).empty():
+                    if self.can_eat((i, j)) and self.get_square(
                             (i, j)).figure.color == color:
                         return True
         return False
 
     def move(self, position_from, position_to):
-        return self.get_ceil(position_from).figure.move(self, position_from,
-                                                        position_to)
+        return self.get_square(position_from).figure.move(self, position_from,
+                                                          position_to)
 
     def update_figures(self):
         for square in self.board[0]:
@@ -294,9 +294,9 @@ class Checkers:
             for square in line:
                 square.beaten = False
 
-    def click_ceil(self, row, column):
+    def click_square(self, row, column):
         if self.board.board[row][column].figure is None:
-            if not self.board.get_ceil((row, column)).beaten:
+            if not self.board.get_square((row, column)).beaten:
                 print("Ошибка нет фигуры")
                 return
             self.clear_mark()
@@ -345,7 +345,7 @@ while game.winner is None:
             'Выбери клетку, {}\n'.format(
                 game.get_current_player_icon())).split())
         print(chr(27) + "[2J")
-        game.click_ceil(x, y)
+        game.click_square(x, y)
         game.update()
     except:
         continue
