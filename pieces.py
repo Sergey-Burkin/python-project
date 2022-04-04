@@ -189,7 +189,7 @@ class King(Figure):
         if self.color == Color.WHITE:
             return WHITE_KING_COLOR
         if self.color == Color.BLACK:
-            return WHITE_MEN_COLOR
+            return BLACK_KING_COLOR
 
     def draw(self, win, position, square_width, square_height):
         center = get_center_position(position, square_width, square_height)
