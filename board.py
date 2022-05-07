@@ -3,7 +3,6 @@ from square import *
 
 
 class Board:
-    board = []
     size = 10
     chosen = None
     cnt = {}

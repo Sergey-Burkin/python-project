@@ -1,7 +1,8 @@
 import pygame
+import enum
 
 
-class Color(object):
+class Color(enum.Enum):
     BLACK = 0
     WHITE = 1
 

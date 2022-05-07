@@ -1,4 +1,6 @@
-from graphic import *
+import pygame
+from graphic import Color, BLACK_KING_COLOR, BLACK_MEN_COLOR, WHITE_KING_COLOR, \
+    WHITE_MEN_COLOR, crown, crown_rect
 
 INF = 10000
 
@@ -64,7 +66,10 @@ class Men(Figure):
         self.color = color
 
     def get_image(self):
-        return ['⛂', '⛀'][self.color == Color.WHITE]
+        if self.color == Color.WHITE:
+            return '⛀'
+        else:
+            return '⛂'
 
     def can_eat(self, board, my_position, mark_squares=False):
         result = False
@@ -126,7 +131,10 @@ class King(Figure):
     directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
 
     def get_image(self):
-        return ['⛃', '⛁'][self.color == Color.WHITE]
+        if self.color == Color.WHITE:
+            return '⛁'
+        else:
+            return '⛃'
 
     def __init__(self, color=Color.WHITE):
         self.color = color
