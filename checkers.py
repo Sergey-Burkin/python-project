@@ -23,11 +23,12 @@ def color_to_pygame_color(color):
 
 
 class Checkers:
-    board = Board()
-    board.set_checkers()
-    turn = Color.WHITE
-    winner = None
-    chosen_position = None
+    def __init__(self):
+        self.board = Board()
+        self.board.set_checkers()
+        self.turn = Color.WHITE
+        self.winner = None
+        self.chosen_position = None
 
     def next_turn(self):
         self.turn = next_color(self.turn)

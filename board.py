@@ -4,8 +4,6 @@ from square import *
 
 class Board:
     size = 10
-    chosen = None
-    cnt = {}
 
     def __init__(self, size=10):
         self.size = size

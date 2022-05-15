@@ -3,8 +3,10 @@ from graphic import *
 
 class Square:
     color = Color.WHITE
-    figure = None
-    beaten = False
+
+    def __init__(self):
+        self.figure = None
+        self.beaten = False
 
     def empty(self):
         return self.figure is None
